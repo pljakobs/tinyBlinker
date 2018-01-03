@@ -1,4 +1,4 @@
-//#include <TinyDebugSerial.h>
+  //#include <TinyDebugSerial.h>
 //TinyDebugSerial mySerial = Serial();
 
 #include <SoftwareSerial.h>
@@ -8,7 +8,7 @@
 #define rx 2
 #define tx 0
 
-#define ver 202
+#define ver 204
 /*
   #define tl 900
   #define ts 300
@@ -39,17 +39,23 @@ void setup() {
 
   EEPROM.get(eeaddr,myParams);
 
-  OSCCAL=myParams.cal;
-  delay(20);
-  mySerial.begin(9600);
   
-  if (myParams.tl == 0xffff && myParams.ts == 0xffff  && myParams.tw == 0xffff){
+  if ((myParams.tl == 0xffff && myParams.ts == 0xffff  && myParams.tw == 0xffff)||(myParams.tl==0x0000 && myParams.ts==0x000)){
     myParams.tl = 900;
     myParams.ts = 300;
     myParams.tw = 100;
     myParams.imin=40;
-    
+    myParams.iu=10; // default starting values for the U/I
+    myParams.il=23; // curve to detect single missing lamps
+    if(myParams.cal==0xff) myParams.cal=0x85;
+    myParams.dirty=true; 
   }
+
+  
+  OSCCAL=myParams.cal;
+  delay(20);
+  mySerial.begin(9600);
+  
   if (myParams.il == 0 or myParams.il == 0xffff){
     myParams.iu == 8;
     myParams.il == 10;
